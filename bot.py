@@ -3,8 +3,8 @@ import json
 import uuid
 import logging
 import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from flask import Flask, jsonify
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import BadRequest, TimedOut, NetworkError
 from telegram.ext import (
@@ -710,28 +710,32 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
 
-# ─── Flask Keep-Alive Server ──────────────────────────────────────────────────
+# ─── Keep-Alive HTTP Server ───────────────────────────────────────────────────
 
-flask_app = Flask(__name__)
-log = logging.getLogger("werkzeug")
-log.setLevel(logging.WARNING)
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == "/health":
+            body = b"ok"
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+        else:
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain")
+            self.end_headers()
+            self.wfile.write(b"online")
+
+    def log_message(self, format, *args):
+        pass
 
 
-@flask_app.route("/")
-def index():
-    data = load_data()
-    cats = {cid: {"name": c["name"], "items": len(c["items"])} for cid, c in data["categories"].items()}
-    return jsonify({"status": "online", "categories": cats})
-
-
-@flask_app.route("/health")
-def health():
-    return jsonify({"status": "ok"}), 200
-
-
-def run_flask() -> None:
-    port = int(os.environ.get("PORT", 5000))
-    flask_app.run(host="0.0.0.0", port=port)
+def run_http_server() -> None:
+    port = int(os.environ.get("PORT", 8080))
+    server = HTTPServer(("0.0.0.0", port), HealthHandler)
+    logger.info(f"HTTP keep-alive server started on port {port}")
+    server.serve_forever()
 
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
@@ -770,9 +774,8 @@ def main() -> None:
     app.add_handler(CallbackQueryHandler(button_handler))
     app.add_error_handler(error_handler)
 
-    flask_thread = threading.Thread(target=run_flask, daemon=True)
-    flask_thread.start()
-    logger.info(f"Flask keep-alive server started on port {os.environ.get('PORT', 5000)}")
+    http_thread = threading.Thread(target=run_http_server, daemon=True)
+    http_thread.start()
 
     logger.info("Bot is running...")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
