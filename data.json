@@ -1,0 +1,82 @@
+{
+  "categories": {
+    "obaid": {
+      "name": "ستكرات عبيد",
+      "items": [],
+      "gate": null
+    },
+    "mahawish": {
+      "name": "ستكرات مهاوش",
+      "items": [
+        {
+          "type": "photo",
+          "file_id": "AgACAgQAAxkBAAMPagT7PevdMbvizdWRDW_tXSj2wrQAAk0Naxt49ClQdDwng6HPWpcBAAMCAAN5AAM7BA"
+        },
+        {
+          "type": "photo",
+          "file_id": "AgACAgQAAxkBAAMNagT7PRDMp5uQt8lzUM931P4an6AAAk4Naxt49ClQGZK-KVZtf2EBAAMCAAN5AAM7BA"
+        },
+        {
+          "type": "photo",
+          "file_id": "AgACAgQAAxkBAAN5agUdcJ5hDhkSvEtGHqL9zrcfDj0AAlgNaxt49ClQ0aryGMAFOkcBAAMCAAN5AAM7BA"
+        }
+      ],
+      "gate": {
+        "question": "الستكرات قد تسبب إعاقة عقلية لبعض الأشخاص \nوقد تحتوي على كميات كبيرة من الزنا \nهل تريد الستكرات؟",
+        "options": [
+          {
+            "label": "نعم",
+            "type": "media"
+          },
+          {
+            "label": "لا",
+            "type": "text",
+            "content": "نعتذر لكم أعزائي الزنوات"
+          }
+        ]
+      }
+    },
+    "57328b5f": {
+      "name": "ستكرات حسكليكو 😋😍",
+      "items": [],
+      "gate": {
+        "question": "الستكرات تحوي مظاهر قد تكون خادشة لبعض الأشخاص كالعري والزنا\nهل انت متأكد من انك تريد الستكرات؟",
+        "options": [
+          {
+            "label": "نعم",
+            "type": "text",
+            "content": "من كل عقلك؟\nطب يلا شفلك حد ينيكك"
+          },
+          {
+            "label": "لا",
+            "type": "text",
+            "content": "نعم للأخلاق الفاضلة"
+          }
+        ]
+      }
+    },
+    "0f4b1c41": {
+      "name": "العظمة 😗",
+      "items": [
+        {
+          "type": "photo",
+          "file_id": "AgACAgQAAxkBAAOhagUhBM1HL6wzGPY6TLpHwhnDGWUAAlkNaxt49ClQuc6BakfkXUMBAAMCAAN5AAM7BA"
+        }
+      ],
+      "gate": {
+        "question": "برأيك هل يمكن أن تتجسد العظمة على شكل صورة؟",
+        "options": [
+          {
+            "label": "نعم",
+            "type": "media"
+          },
+          {
+            "label": "لا",
+            "type": "text",
+            "content": "شكلك ما تعرف كلمة العظمة اخترعوها عشان توصف مين 🫤"
+          }
+        ]
+      }
+    }
+  }
+}
