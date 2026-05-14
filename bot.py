@@ -732,7 +732,8 @@ class HealthHandler(BaseHTTPRequestHandler):
 
 
 def run_http_server() -> None:
-    port = int(os.environ.get("PORT", 8080))
+    port = int(os.environ.get("PORT", 8099))
+    HTTPServer.allow_reuse_address = True
     server = HTTPServer(("0.0.0.0", port), HealthHandler)
     logger.info(f"HTTP keep-alive server started on port {port}")
     server.serve_forever()
