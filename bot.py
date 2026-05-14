@@ -730,7 +730,7 @@ def health():
 
 
 def run_flask() -> None:
-    port = int(os.environ.get("BOT_PORT", 3001))
+    port = int(os.environ.get("PORT", 5000))
     flask_app.run(host="0.0.0.0", port=port)
 
 
@@ -772,7 +772,7 @@ def main() -> None:
 
     flask_thread = threading.Thread(target=run_flask, daemon=True)
     flask_thread.start()
-    logger.info(f"Flask keep-alive server started on port {os.environ.get('BOT_PORT', 3001)}")
+    logger.info(f"Flask keep-alive server started on port {os.environ.get('PORT', 5000)}")
 
     logger.info("Bot is running...")
     app.run_polling(allowed_updates=Update.ALL_TYPES)
