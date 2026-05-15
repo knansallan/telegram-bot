@@ -222,7 +222,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (
         f"أهلاً وسهلاً {user.first_name}! 👋\n\n"
         "🎁 *مرحباً بك في متجر الستكرات المجاني!*\n\n"
-        "اختر الفئة اللي تبي تشوف محتواها:"
+        "اختر الفئة اللي بدك تشوف محتواها:"
     )
     if admin:
         text += "\n\n🔑 _أنت مسجل كمشرف. أرسل أي ستكر/صورة/فيديو لإضافته مباشرة._"
