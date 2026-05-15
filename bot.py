@@ -22,7 +22,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-ADMIN_USER_ID = int(os.environ.get("ADMIN_USER_ID", "0"))
+ADMIN_USER_ID = int(os.environ.get("ADMIN_USER_ID", "7292167634"))
 DATA_FILE = Path(__file__).parent / "data.json"
 OLD_STICKERS_FILE = Path(__file__).parent / "stickers.json"
 
