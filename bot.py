@@ -26,6 +26,29 @@ ADMIN_USER_ID = int(os.environ.get("ADMIN_USER_ID", "7292167634"))
 DATA_FILE = Path(__file__).parent / "data.json"
 OLD_STICKERS_FILE = Path(__file__).parent / "stickers.json"
 
+# ─── MongoDB ───────────────────────────────────────────────────────────────────
+
+_mongo_db = None
+
+def get_mongo():
+    global _mongo_db
+    if _mongo_db is not None:
+        return _mongo_db
+    uri = os.environ.get("MONGODB_URI", "")
+    if not uri:
+        return None
+    try:
+        import pymongo
+        client = pymongo.MongoClient(uri, serverSelectionTimeoutMS=8000)
+        client.admin.command("ping")
+        _mongo_db = client["telegram_bot"]
+        logger.info("Connected to MongoDB Atlas")
+        return _mongo_db
+    except Exception as e:
+        logger.error(f"MongoDB connection failed: {e}")
+        return None
+
+
 # ─── Data Model ───────────────────────────────────────────────────────────────
 # categories:
 #   <cat_id>:
@@ -42,13 +65,29 @@ OLD_STICKERS_FILE = Path(__file__).parent / "stickers.json"
 def default_data() -> dict:
     return {
         "categories": {
-            "obaid":   {"name": "ستكرات عبيد",   "items": [], "gate": None},
-            "mahawish": {"name": "ستكرات مهاوش", "items": [], "gate": None},
+            "obaid":    {"name": "ستكرات عبيد",   "items": [], "gate": None},
+            "mahawish": {"name": "ستكرات مهاوش",  "items": [], "gate": None},
         }
     }
 
 
 def load_data() -> dict:
+    db = get_mongo()
+    if db is not None:
+        try:
+            cats = {}
+            for doc in db.categories.find():
+                cat_id = doc.pop("_id")
+                cats[cat_id] = doc
+            if not cats:
+                data = default_data()
+                save_data(data)
+                return data
+            return {"categories": cats}
+        except Exception as e:
+            logger.error(f"MongoDB load_data failed: {e}")
+
+    # ── File fallback (local dev) ───────────────────────────────────────────
     if DATA_FILE.exists():
         try:
             with open(DATA_FILE, "r", encoding="utf-8") as f:
@@ -73,11 +112,27 @@ def load_data() -> dict:
 
 
 def save_data(data: dict) -> None:
+    db = get_mongo()
+    if db is not None:
+        try:
+            live_ids = list(data["categories"].keys())
+            for cat_id, cat in data["categories"].items():
+                db.categories.replace_one(
+                    {"_id": cat_id},
+                    {"_id": cat_id, **cat},
+                    upsert=True,
+                )
+            db.categories.delete_many({"_id": {"$nin": live_ids}})
+            return
+        except Exception as e:
+            logger.error(f"MongoDB save_data failed: {e}")
+
+    # ── File fallback (local dev) ───────────────────────────────────────────
     try:
         with open(DATA_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception as e:
-        logger.error(f"Failed to save data: {e}")
+        logger.error(f"Failed to save data.json: {e}")
 
 
 def new_cat_id() -> str:
@@ -222,7 +277,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     text = (
         f"أهلاً وسهلاً {user.first_name}! 👋\n\n"
         "🎁 *مرحباً بك في متجر الستكرات المجاني!*\n\n"
-        "اختر الفئة اللي بدك تشوف محتواها:"
+        "اختر الفئة اللي تبي تشوف محتواها:"
     )
     if admin:
         text += "\n\n🔑 _أنت مسجل كمشرف. أرسل أي ستكر/صورة/فيديو لإضافته مباشرة._"
